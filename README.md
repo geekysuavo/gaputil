@@ -68,8 +68,11 @@ Once Julia is installed into the path, you can compile and install
 **gaputil** as follows:
 
 > git clone git://github.com/geekysuavo/gaputil.git
+
 > cd gaputil
+
 > make
+
 > sudo make install
 
 ## Licensing
