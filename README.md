@@ -52,8 +52,8 @@ The sine-gap equation is fairly simple as well:
 The sine-burst equation gets a bit more complicated:
 
 > g(**x**, **d**, **O**, **N**, **L**) =
-> **L** * sin((pi/2) * (**x** + sum(**O**)) / sum(**N**))
-> * sin((pi/4) * **N**[**d**] * (**x** + sum(**O**)) / sum(**N**))^2
+> **L** * sin((pi/2) * (**x** + sum(**O**)) / sum(**N**)) *
+> sin((pi/4) * **N**[**d**] * (**x** + sum(**O**)) / sum(**N**))^2
 
 In short, **gaputil** accepts almost any inline function having
 Julia syntax.
