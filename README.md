@@ -77,7 +77,7 @@ Once Julia is installed into the path, you can compile and install
 
 ## Licensing
 
-The gaputil project is released under the [GNU GPL 2.0] (
+The **gaputil** project is released under the [GNU GPL 2.0] (
 http://www.gnu.org/licenses/old-licenses/gpl-2.0.html).
 
 Have fun with it,
