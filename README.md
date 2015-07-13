@@ -28,10 +28,12 @@ form, passes it to Julia for just-in-time compilation, and then evaluates it
 as needed until an optimal schedule is arrived at. The function prototype
 used by **gaputil** looks like this in Julia:
 
-> g(**x**::Float64, **d**::Int32,
->   **O**::Array{Float64,1},
->   **N**::Array{Float64,1},
->   **L**::Float64)
+```julia
+g(x::Float64, d::Int32,
+  O::Array{Float64,1},
+  N::Array{Float64,1},
+  L::Float64)
+```
 
 where **x** holds the current gap sequence term, **d** is the currently
 sampled grid dimension, **O** is the current origin in the grid, **N**
