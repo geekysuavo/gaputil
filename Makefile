@@ -1,7 +1,7 @@
 
 # compiler configuration.
 CC=gcc
-CFLAGS=-g -O2 -fPIC -Wall -Wformat -Werror
+CFLAGS=-g -O2 -fPIC -Wall -Wformat -Wno-strict-aliasing
 LDLIBS=-lm
 LDFLAGS=
 
@@ -19,9 +19,9 @@ LDLIBS+= $(shell $(JL_SHARE)/julia-config.jl --ldlibs)
 LDFLAGS+= $(shell $(JL_SHARE)/julia-config.jl --ldflags)
 
 # binaries and objects to compile and link.
-BIN=gaputil
-MAN=gaputil.1
-OBJS=tup.o seq.o srt.o term.o gaputil.o
+BIN=gaputil rejutil
+MAN=gaputil.1 rejutil.1
+OBJS=tup.o seq.o srt.o rej.o term.o qrng.o
 
 # suffixes used in the build.
 .SUFFIXES: .c .o
@@ -29,8 +29,13 @@ OBJS=tup.o seq.o srt.o term.o gaputil.o
 # all: default target.
 all: check-julia $(BIN)
 
-# $(BIN): executable linkage target.
-$(BIN): $(OBJS)
+# gaputil: first executable linkage target.
+gaputil: $(OBJS) gaputil.o
+	@echo " LD $@"
+	@$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+
+# rejutil: second executable linkage target.
+rejutil: $(OBJS) rejutil.o
 	@echo " LD $@"
 	@$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
@@ -50,7 +55,7 @@ install: all
 # clean: built file removal target.
 clean:
 	@echo " CLEAN"
-	@rm -f $(BIN) $(OBJS)
+	@rm -f $(BIN) $(addsuffix .o,$(BIN)) $(OBJS)
 
 # again: repeat/rebuild compilation target.
 again: clean all

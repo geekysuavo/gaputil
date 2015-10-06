@@ -89,7 +89,7 @@ int terminit (const char *fstr) {
  */
 void termfree (void) {
   /* clean up the julia internals. */
-  jl_atexit_hook();
+  jl_atexit_hook(0);
 }
 
 /* term(): compute the next term in the deterministic gap sequence

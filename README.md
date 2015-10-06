@@ -1,10 +1,15 @@
 # gaputil
 
-A small utility to construct multidimensional nonuniform sampling schedules
-using the generalized gap sampling framework published in:
+A pair of command-line utilities for deterministically (_i.e._ without
+pseudorandom numbers) constructing nonuniform sampling schedules on
+multidimensional Nyquist grids. The **gaputil** is a utility to construct
+schedules using the generalized gap sampling framework published in:
 
 > Worley, B., Powers, R., _Deterministic Multidimensional Nonuniform
 > Gap Sampling_, Journal of Magnetic Resonance, 2015, In revision.
+
+The **rejutil** is a utility to construct schedules from density functions
+using a quasirandom accept-reject sampling method.
 
 ## Introduction
 
@@ -21,7 +26,7 @@ projects. By embedding Julia into my existing gap sampling algorithm, this
 utility enables the construction of NUS schedules from _completely arbitrary_
 gap equations.
 
-### Examples
+### Examples using **gaputil**
 
 The **gaputil** program reads a gap equation from the command line in string
 form, passes it to Julia for just-in-time compilation, and then evaluates it
@@ -66,14 +71,43 @@ g(x, d, O, N, L) =
 In short, **gaputil** accepts almost any inline function having
 Julia syntax.
 
+### Examples using **rejutil**
+
+The **rejutil** program also uses Julia to interpret its density function,
+but this function is of a simpler form:
+
+```julia
+f(x::Array{Float64,1}, N::Array{Float64,1})
+```
+
+where **x** now holds the _current_ grid index, and **N** still holds the
+total grid size. No optimization is performed: **rejutil** simply draws a
+set number of points (grid indices) from the distribution specified in the
+density function.
+
+The simplest possible density function is a uniform grid:
+
+```julia
+f(x, N) = 1.0
+```
+
+An exponentially weighted function would look like this:
+
+```julia
+f(x, N) = exp(-sum(x ./ N))
+```
+
+Like **gaputil**, **rejutil** will accept any inline function having Julia
+syntax and conforming to the interface specified above.
+
 ### Installing
 
 You will need to have Julia 0.4.0-dev compiled and installed in
-order to build **gaputil**. It is recommended that you compile
-and install from the latest GitHub nightly commit.
+order to build **gaputil** and **rejutil**. It is recommended that
+you compile and install from the latest GitHub nightly commit.
 
 Once Julia is installed into the path, you can compile and install
-**gaputil** as follows:
+**gaputil** and **rejutil** as follows:
 
 > git clone git://github.com/geekysuavo/gaputil.git
 
@@ -85,7 +119,7 @@ Once Julia is installed into the path, you can compile and install
 
 ## Licensing
 
-The **gaputil** project is released under the [GNU GPL 2.0] (
+This project is released under the [GNU GPL 2.0] (
 http://www.gnu.org/licenses/old-licenses/gpl-2.0.html).
 
 Have fun with it,
