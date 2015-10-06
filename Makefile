@@ -1,7 +1,7 @@
 
 # compiler configuration.
 CC=gcc
-CFLAGS=-g -O2 -fPIC -Wall -Wformat -Wno-strict-aliasing
+CFLAGS=-g -O2 -fPIC -I./src -Wall -Wformat -Wno-strict-aliasing
 LDLIBS=-lm
 LDFLAGS=
 
@@ -19,9 +19,10 @@ LDLIBS+= $(shell $(JL_SHARE)/julia-config.jl --ldlibs)
 LDFLAGS+= $(shell $(JL_SHARE)/julia-config.jl --ldflags)
 
 # binaries and objects to compile and link.
-BIN=gaputil rejutil
-MAN=gaputil.1 rejutil.1
-OBJS=tup.o seq.o srt.o rej.o term.o qrng.o
+BIN=bin/gaputil bin/rejutil
+MAN=man/gaputil.1 man/rejutil.1
+OBJS=src/tup.o src/seq.o src/srt.o src/rej.o src/term.o src/qrng.o
+BINOBJS=$(addsuffix .o,$(BIN))
 
 # suffixes used in the build.
 .SUFFIXES: .c .o
@@ -30,12 +31,12 @@ OBJS=tup.o seq.o srt.o rej.o term.o qrng.o
 all: check-julia $(BIN)
 
 # gaputil: first executable linkage target.
-gaputil: $(OBJS) gaputil.o
+bin/gaputil: $(OBJS) bin/gaputil.o
 	@echo " LD $@"
 	@$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 # rejutil: second executable linkage target.
-rejutil: $(OBJS) rejutil.o
+bin/rejutil: $(OBJS) bin/rejutil.o
 	@echo " LD $@"
 	@$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
@@ -55,7 +56,7 @@ install: all
 # clean: built file removal target.
 clean:
 	@echo " CLEAN"
-	@rm -f $(BIN) $(addsuffix .o,$(BIN)) $(OBJS)
+	@rm -f $(BIN) $(OBJS) $(BINOBJS)
 
 # again: repeat/rebuild compilation target.
 again: clean all
@@ -68,10 +69,10 @@ check-julia:
 # fixme: no-op target to check for fixme statements.
 fixme:
 	@echo " FIXME"
-	@grep -RHni --color fixme *.[ch1] || echo " None found"
+	@grep -RHni --color fixme src/*.[ch] bin/*.[ch] || echo " None found"
 
 # lines: no-op target to perform a source code line count.
 lines:
 	@echo " WC"
-	@wc -l *.[ch1]
+	@wc -l src/*.[ch] bin/*.[ch] man/*.1
 
