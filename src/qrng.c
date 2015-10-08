@@ -69,9 +69,6 @@ int qrngalloc (qrng_t *g, unsigned int n) {
     g->sv[i] = (unsigned int*) calloc(QRNG_MAX, sizeof(unsigned int));
     if (!g->sv[i])
       return 0;
-
-    /* initialize the first state value. */
-    g->sv[i][0] = 1;
   }
 
   /* initialize the first base. */

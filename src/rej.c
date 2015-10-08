@@ -229,7 +229,6 @@ int rej (const char *fn, tuple_t *N, double d, tuple_t *lst) {
 
   /* initialize the output tuple. */
   tupinit(lst);
-  tupappend(lst, 0);
 
   /* allocate the index tuple. */
   if (!tupalloc(&x, tupsize(N))) {
