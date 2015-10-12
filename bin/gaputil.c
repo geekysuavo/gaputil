@@ -109,9 +109,6 @@ int main (int argc, char **argv) {
     return 1;
   }
 
-  /* sort the final schedule array and remove duplicate entries. */
-  tupuniq(&xlst);
-
   /* print the final schedule values. */
   for (i = 0; i < tupsize(&xlst); i++) {
     /* unpack and print the current schedule value. */

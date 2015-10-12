@@ -25,12 +25,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <time.h>
 
-/* include the tuple, sequence, sorting and term headers. */
+/* include the tuple, sequence and term headers. */
 #include "tup.h"
 #include "seq.h"
-#include "srt.h"
 #include "term.h"
 
 /* define a soft-limit for the number of dimensions that the program

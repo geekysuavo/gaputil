@@ -32,8 +32,9 @@
 /* include the julia library header. */
 #include <julia.h>
 
-/* include the tuple and qrng headers. */
+/* include the tuple, search tree and qrng headers. */
 #include "tup.h"
+#include "bst.h"
 #include "qrng.h"
 
 /* define required function return values:

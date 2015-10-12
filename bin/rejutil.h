@@ -27,9 +27,8 @@
 #include <math.h>
 #include <time.h>
 
-/* include the tuple, sorting and sampling headers. */
+/* include the tuple and sampling headers. */
 #include "tup.h"
-#include "srt.h"
 #include "rej.h"
 
 /* define a soft-limit for the number of dimensions that the program

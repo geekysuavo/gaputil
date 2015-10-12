@@ -37,13 +37,13 @@
  *  @L: sequence term scaling factor to use during computation.
  *  @origin: origin at which to begin the sequence.
  *  @dir: direction along which to append the vector.
- *  @lst: pointer to the output tuple of indices.
+ *  @Tlst: pointer to the output tree of indices.
  *
  * returns:
  *  integer indicating whether the function succeeded (1) or not (0).
  */
 int seqappend (tuple_t *N, double L, tuple_t *origin, unsigned int dir,
-               tuple_t *lst) {
+               bst_t *Tlst) {
   /* declare required variables:
    *  @xi: output packed linear sequence index.
    *  @oridx: linear index value of the origin.
@@ -82,8 +82,8 @@ int seqappend (tuple_t *N, double L, tuple_t *origin, unsigned int dir,
       /* compute the new index value. */
       xi = oridx + stride * (unsigned int) round(x - 1.0);
 
-      /* append the new value to the output tuple. */
-      tupappend(lst, xi);
+      /* insert the new value to the output search tree. */
+      bstinsert(Tlst, xi);
     }
   }
   while (round(x) <= xend);
@@ -102,14 +102,14 @@ int seqappend (tuple_t *N, double L, tuple_t *origin, unsigned int dir,
  *  @L: sequence term scaling factor to use during computation.
  *  @origin: current origin from which to generate subsequences.
  *  @mask: current available dimensions for new subsequences.
- *  @lst: pointer to the output tuple of indices.
+ *  @Tlst: pointer to the output tree of indices.
  *
  * returns:
  *  integer indicating whether sub-sequence generation
  *  succeeded (1) or not (0).
  */
 int seqfn (tuple_t *N, double L, tuple_t *origin, tuple_t *mask,
-           tuple_t *lst) {
+           bst_t *Tlst) {
   /* declare required variables:
    *  @i: general-purpose loop index.
    *  @pos: offset position of the current sub-sequence.
@@ -129,7 +129,7 @@ int seqfn (tuple_t *N, double L, tuple_t *origin, tuple_t *mask,
     dir = tupfind(mask) - 1;
 
     /* drop a single vector of sequence terms down. */
-    return seqappend(N, L, origin, dir, lst);
+    return seqappend(N, L, origin, dir, Tlst);
   }
 
   /* allocate the sub-level origin and mask tuples. */
@@ -158,7 +158,7 @@ int seqfn (tuple_t *N, double L, tuple_t *origin, tuple_t *mask,
         tupset(&suborigin, i, i == dir ? pos : tupget(origin, i));
 
       /* execute this function at a lower level of recursion. */
-      ret = seqfn(N, L, &suborigin, &submask, lst);
+      ret = seqfn(N, L, &suborigin, &submask, Tlst);
 
       /* check that execution succeeded. */
       if (ret != TERM_OK)
@@ -197,16 +197,21 @@ int seq (const char *fn, tuple_t *N, double d, tuple_t *lst) {
    *  @ntol: tolerable discrepancy value of schedules.
    *  @ret: return value from the seqfn() call.
    *  @iter: optimization iteration counter.
+   *  @Tlst: binary search tree for index storage.
    *  @L: sequence term scaling factor to optimize.
    *  @w: weight applied to optimize the scaling factor.
    */
   int n, nout, nerr, ntol, ret;
   tuple_t origin, mask;
   unsigned int iter;
+  bst_t *Tlst;
   double L, w;
 
   /* initialize the output tuple. */
   tupinit(lst);
+
+  /* initialize the binary search tree. */
+  Tlst = NULL;
 
   /* allocate the top-level tuples. */
   if (!tupalloc(&origin, tupsize(N)) || !tupalloc(&mask, tupsize(N)))
@@ -244,13 +249,17 @@ int seq (const char *fn, tuple_t *N, double d, tuple_t *lst) {
     /* initialize the output tuple. */
     tupfree(lst);
 
+    /* initialize the binary search tree. */
+    bstfree(Tlst);
+    Tlst = bstalloc();
+
     /* call the recursive sequence generation function. */
-    ret = seqfn(N, L * w, &origin, &mask, lst);
+    ret = seqfn(N, L * w, &origin, &mask, Tlst);
 
     /* check the function's return value. */
     if (ret == TERM_OK) {
       /* the function succeeded: the sequence is well-behaved. */
-      nout = (signed int) tupsize(lst);
+      nout = (signed int) Tlst->n;
     }
     else if (ret == TERM_INVALID) {
       /* the function failed: the sequence is poorly behaved. */
@@ -274,6 +283,10 @@ int seq (const char *fn, tuple_t *N, double d, tuple_t *lst) {
     w *= (1.0 + 0.5 * (double) nerr / (double) n);
   }
   while (abs(nerr) > ntol && ++iter < SEQ_MAX_ITER);
+
+  /* dump the sorted indices from the search tree. */
+  bstsort(Tlst, lst);
+  bstfree(Tlst);
 
   /* free the top-level tuples. */
   tupfree(&origin);

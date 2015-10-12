@@ -218,17 +218,23 @@ int rej (const char *fn, tuple_t *N, double d, tuple_t *lst) {
    *  @pdf: probability density function, evaluated on the grid.
    *  @pdfmax: largest value of @pdf over the entire data grid.
    *  @x: unpacked grid point index for density evaluation.
+   *  @Tlst: binary search tree for index storage.
    *  @G: quasirandom number generator structure.
    *  @i: term generation loop counter.
    *  @n: term generation loop size.
+   *  @xi: packed linear index.
    */
   unsigned int i, n, xi;
   double *pdf, pdfmax;
+  bst_t *Tlst;
   tuple_t x;
   qrng_t G;
 
   /* initialize the output tuple. */
   tupinit(lst);
+
+  /* initialize the binary search tree. */
+  Tlst = NULL;
 
   /* allocate the index tuple. */
   if (!tupalloc(&x, tupsize(N))) {
@@ -280,14 +286,19 @@ int rej (const char *fn, tuple_t *N, double d, tuple_t *lst) {
     pdf[i] /= pdfmax;
 
   /* loop over the number of grid points to compute. */
-  for (i = 0; i < n; i++) {
+  do {
     /* sample a new value on the grid. */
     rejsamp(&G, pdf, &x, N);
 
-    /* pack and append the new value into the output list. */
+    /* pack and insert the new value into the search tree. */
     tuppack(&x, N, &xi);
-    tupappend(lst, xi);
+    Tlst = bstinsert(Tlst, xi);
   }
+  while (Tlst->n < n);
+
+  /* dump the sorted samples from the search tree. */
+  bstsort(Tlst, lst);
+  bstfree(Tlst);
 
   /* free the allocated memory. */
   qrngfree(&G);

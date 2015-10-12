@@ -21,22 +21,48 @@
  */
 
 /* ensure once-only inclusion. */
-#ifndef __GAPUTIL_SEQ_H__
-#define __GAPUTIL_SEQ_H__
+#ifndef __GAPUTIL_BST_H__
+#define __GAPUTIL_BST_H__
 
-/* include standard c library headers. */
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-/* include the tuple, search tree and term headers. */
+/* include the tuple header. */
 #include "tup.h"
-#include "bst.h"
-#include "term.h"
+
+/* define constants used to define tree node coloring.
+ */
+#define BST_BLACK  0
+#define BST_RED    1
+
+/* bst_node_t: type definition of a pointer to a search tree node.
+ */
+typedef struct bst bst_t;
+
+/* bst_t: type definition of a binary search tree data structure.
+ */
+struct bst {
+  /* @up: pointer to the parent node.
+   * @left: pointer to the left child node.
+   * @right: pointer to the right child node.
+   */
+  bst_t *up, *left, *right;
+
+  /* @value: data contained by the current tree node.
+   * @color: coloring (red/black) of the current tree node.
+   * @n: total number of unique elements (root only).
+   */
+  unsigned int value, color, n;
+};
 
 /* function declarations: */
 
-int seq (const char *fn, tuple_t *N, double d, tuple_t *lst);
+bst_t *bstalloc (void);
 
-#endif /* !__GAPUTIL_SEQ_H__ */
+void bstinit (bst_t *t);
+
+void bstfree (bst_t *t);
+
+bst_t *bstinsert (bst_t *t, unsigned int val);
+
+void bstsort (bst_t *t, tuple_t *tout);
+
+#endif /* !__GAPUTIL_BST_H__ */
 
