@@ -187,8 +187,10 @@ void rejsamp (qrng_t *G, double *pdf, tuple_t *x, tuple_t *N) {
     qrngeval(G);
 
     /* construct the grid index. */
-    for (i = 0; i < tupsize(x); i++)
-      tupset(x, i, (unsigned int) round(G->x[i] * ((double) tupget(N, i))));
+    for (i = 0; i < tupsize(x); i++) {
+      G->x[i] *= ((double) (tupget(N, i) - 1));
+      tupset(x, i, (unsigned int) round(G->x[i]));
+    }
 
     /* extract the uniform deviate. */
     u = G->x[G->n - 1];
