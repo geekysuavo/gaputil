@@ -27,6 +27,15 @@
 #define TERM_FMT \
   "g(x::Float64, d::Int32, O::Array, N::Array, L::Float64) = %s + 1.0;"
 
+/* TERM_EXP_POISRND: expression for quasirandom poisson-distributed terms. */
+#define TERM_EXP_POISRND \
+  "poisrnd(x) = -x - 2.0"
+
+/* TERM_EXP_PG: expression for the poisson-gap preprogrammed method. */
+#define TERM_EXP_PG \
+  "poissongap(x, d, O, N, L) = \
+   poisrnd(L * sin((pi / 2) * (x + sum(O)) / sum(N)))"
+
 /* TERM_EXP_SG: expression for the sine-gap preprogrammed method. */
 #define TERM_EXP_SG \
   "sinegap(x, d, O, N, L) = \
@@ -40,6 +49,9 @@
 
 /* termfn: julia function handle that holds the compiled gap equation. */
 jl_function_t *termfn;
+
+/* termgen: quasirandom number generator for poisson-distributed terms. */
+qrng_t termgen;
 
 /* terminit(): initialize the gap sequence term computation environment.
  *
@@ -69,6 +81,8 @@ int terminit (const char *fstr) {
   snprintf(stmt, nstmt, TERM_FMT, fstr);
 
   /* evaluate the function assignment. */
+  (void) jl_eval_string(TERM_EXP_POISRND);
+  (void) jl_eval_string(TERM_EXP_PG);
   (void) jl_eval_string(TERM_EXP_SG);
   (void) jl_eval_string(TERM_EXP_SB);
   (void) jl_eval_string(stmt);
@@ -81,6 +95,13 @@ int terminit (const char *fstr) {
   /* get the compiled function handle. */
   termfn = jl_get_function(jl_current_module, "g");
 
+  /* allocate the quasirandom number generator. */
+  if (!qrngalloc(&termgen, 1))
+    return TERM_ERR;
+
+  /* iterate the qrng just once to avoid returning zero. */
+  qrngeval(&termgen);
+
   /* return success. */
   return TERM_OK;
 }
@@ -88,8 +109,47 @@ int terminit (const char *fstr) {
 /* termfree(): allow the julia environment to free its internals.
  */
 void termfree (void) {
+  /* free the quasirandom number generator. */
+  qrngfree(&termgen);
+
   /* clean up the julia internals. */
   jl_atexit_hook(0);
+}
+
+/* termpoisson(): return a quasirandomly poisson-distributed value,
+ * given a rate parameter.
+ *
+ * arguments:
+ *  @lambda: negative of the input rate parameter.
+ *
+ * returns:
+ *  floating point value of the result.
+ */
+double termpoisson (double lambda) {
+  /* declare required variables:
+   *  @L: exponentiated negated rate.
+   *  @k: final poisson variate.
+   */
+  double L, p, k;
+
+  /* initialize the intermediate values. */
+  L = exp(lambda);
+  k = 0.0;
+  p = 1.0;
+
+  /* loop until the final iterate is reached. */
+  do {
+    /* compute a new iterate within the qrng. */
+    qrngeval(&termgen);
+
+    /* update the intermediate values. */
+    p *= termgen.x[0];
+    k += 1.0;
+  }
+  while (p >= L);
+
+  /* return the final value. */
+  return k;
 }
 
 /* term(): compute the next term in the deterministic gap sequence
@@ -111,9 +171,10 @@ int term (double *x, int d, tuple_t *O, tuple_t *N, double L) {
    *  @i: general array index and loop counter.
    *  @ret: return status value for this function.
    *  @theta: sequence term angular value.
+   *  @gx: unboxed gap equation result.
    */
   int i, ret = TERM_OK;
-  double theta;
+  double theta, gx;
 
   /* declare required julia variables:
    *  @gval: boxed return value of the gap method call.
@@ -198,7 +259,17 @@ int term (double *x, int d, tuple_t *O, tuple_t *N, double L) {
   }
   else {
     /* unbox the computed result. */
-    *x += jl_unbox_float64(gval);
+    gx = jl_unbox_float64(gval);
+
+    /* check the sign of the result. */
+    if (gx >= 0.0) {
+      /* perform a deterministic update. */
+      *x += gx;
+    }
+    else {
+      /* perform a quasi-random update. */
+      *x += termpoisson(gx + 1.0);
+    }
   }
 
   /* release the references to the function arguments. */
