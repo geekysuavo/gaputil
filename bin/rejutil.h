@@ -27,9 +27,10 @@
 #include <math.h>
 #include <time.h>
 
-/* include the tuple and sampling headers. */
+/* include the tuple, sampling and evaluation headers. */
 #include "tup.h"
 #include "rej.h"
+#include "eval.h"
 
 /* define a soft-limit for the number of dimensions that the program
  * is willing to build grids on.

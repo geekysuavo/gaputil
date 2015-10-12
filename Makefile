@@ -21,7 +21,8 @@ LDFLAGS+= $(shell $(JL_SHARE)/julia-config.jl --ldflags)
 # binaries and objects to compile and link.
 BIN=bin/gaputil bin/rejutil
 MAN=man/gaputil.1 man/rejutil.1
-OBJS=src/tup.o src/bst.o src/seq.o src/rej.o src/term.o src/qrng.o
+OBJ=tup bst srt seq rej eval qrng
+OBJS=$(addsuffix .o,$(addprefix src/,$(OBJ)))
 BINOBJS=$(addsuffix .o,$(BIN))
 
 # suffixes used in the build.

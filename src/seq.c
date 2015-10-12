@@ -73,8 +73,8 @@ int seqappend (tuple_t *N, double L, tuple_t *origin, unsigned int dir,
     /* compute the next term in the sequence, but return failure
      * if the sequence is not well-behaved.
      */
-    ret = term(&x, dir, origin, N, L);
-    if (ret != TERM_OK)
+    ret = evalgap(&x, dir, origin, N, L);
+    if (ret != EVAL_OK)
       return ret;
 
     /* ensure the computed term is in bounds. */
@@ -161,7 +161,7 @@ int seqfn (tuple_t *N, double L, tuple_t *origin, tuple_t *mask,
       ret = seqfn(N, L, &suborigin, &submask, Tlst);
 
       /* check that execution succeeded. */
-      if (ret != TERM_OK)
+      if (ret != EVAL_OK)
         return ret;
     }
   }
@@ -217,8 +217,8 @@ int seq (const char *fn, tuple_t *N, double d, tuple_t *lst) {
   if (!tupalloc(&origin, tupsize(N)) || !tupalloc(&mask, tupsize(N)))
     return 0;
 
-  /* initialize the term computation environment. */
-  if (!terminit(fn)) {
+  /* initialize the gap equation evaluation environment. */
+  if (!evalinit(fn, EVAL_GAP)) {
     /* output an error message and return failure. */
     fprintf(stderr, "error: failed to compile gap equation\n");
     return 0;
@@ -257,15 +257,15 @@ int seq (const char *fn, tuple_t *N, double d, tuple_t *lst) {
     ret = seqfn(N, L * w, &origin, &mask, Tlst);
 
     /* check the function's return value. */
-    if (ret == TERM_OK) {
+    if (ret == EVAL_OK) {
       /* the function succeeded: the sequence is well-behaved. */
       nout = (signed int) Tlst->n;
     }
-    else if (ret == TERM_INVALID) {
+    else if (ret == EVAL_INVALID) {
       /* the function failed: the sequence is poorly behaved. */
       nout = (signed int) tupprod(N);
     }
-    else if (ret == TERM_EXCEPTION) {
+    else if (ret == EVAL_EXCEPTION) {
       /* the julia function call failed. */
       fprintf(stderr, "error: failed to evaluate gap equation\n");
       return 0;

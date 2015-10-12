@@ -32,25 +32,13 @@
 /* include the julia library header. */
 #include <julia.h>
 
-/* include the tuple, search tree and qrng headers. */
+/* include the tuple, search tree, qrng and evaluation headers. */
 #include "tup.h"
 #include "bst.h"
 #include "qrng.h"
-
-/* define required function return values:
- *  REJ_OK: indicates success.
- *  REJ_ERR: indicates a general error.
- *  REJ_INVALID: previous sequence term is out of bounds.
- *  REJ_EXCEPTION: an error occurred during gap evalution.
- */
-#define REJ_OK          1
-#define REJ_ERR         0
-#define REJ_INVALID    -1
-#define REJ_EXCEPTION  -2
+#include "eval.h"
 
 /* function declarations: */
-
-void rejfree (void);
 
 int rej (const char *fn, tuple_t *N, double d, tuple_t *lst);
 

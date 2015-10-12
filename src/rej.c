@@ -23,147 +23,6 @@
 /* include the rejection header. */
 #include "rej.h"
 
-/* REJ_FMT: format string for all density equation assignment statements. */
-#define REJ_FMT \
-  "f(x::Array, N::Array) = %s;"
-
-/* rejfn: julia function handle that holds the compiled equation. */
-jl_function_t *rejfn;
-
-/* rejinit(): initialize the density function computation environment.
- *
- * arguments:
- *  @fstr: julia function string to compile and call.
- *
- * returns:
- *  integer indicating whether initialization succeeded.
- */
-int rejinit (const char *fstr) {
-  /* declare required variables:
-   *  @stmt: density function assignment statement string.
-   *  @nstmt: number of characters in the statement string.
-   */
-  char *stmt;
-  int nstmt;
-
-  /* allocate a function string to evaluate. */
-  nstmt = strlen(fstr) + strlen(REJ_FMT) + 32;
-  stmt = (char*) malloc(nstmt * sizeof(char));
-
-  /* check that the string was evaluated. */
-  if (!stmt)
-    return REJ_ERR;
-
-  /* build the function assignment string. */
-  snprintf(stmt, nstmt, REJ_FMT, fstr);
-
-  /* evaluate the function assignment. */
-  (void) jl_eval_string(stmt);
-  free(stmt);
-
-  /* check that the evaluation succeeded. */
-  if (jl_exception_occurred())
-    return REJ_ERR;
-
-  /* get the compiled function handle. */
-  rejfn = jl_get_function(jl_current_module, "f");
-
-  /* return success. */
-  return REJ_OK;
-}
-
-/* rejfree(): allow the julia environment to free its internals.
- */
-void rejfree (void) {
-  /* clean up the julia internals. */
-  jl_atexit_hook(0);
-}
-
-/* rejeval(): compute the density function at a given grid point.
- *
- * arguments:
- *  @x: pointer to the current grid index.
- *  @N: total size of the Nyquist grid.
- *
- * returns:
- *  floating point result.
- */
-double rejeval (tuple_t *x, tuple_t *N) {
-  /* declare required variables:
-   *  @i: general array index and loop counter.
-   *  @fval: computed density function value.
-   */
-  double fval = 0.0;
-  int i;
-
-  /* declare required julia variables:
-   *  @boxfval: boxed return value of the method call.
-   *  @args: array of value pointers passed to the method.
-   *  @arrtype: data type of the arrays passed to the method.
-   *  @arrx, @arrn: arrays passed to the method.
-   *  @datx, @datn: array data pointers.
-   */
-  jl_value_t *boxfval;
-  jl_value_t **args;
-  jl_value_t *arrtype;
-  jl_array_t *arrx, *arrn;
-  double *datx, *datn;
-
-  /* initialize the array data type. */
-  arrtype = jl_apply_array_type(jl_float64_type, 1);
-
-  /* allocate the origin and size arrays. */
-  arrx = jl_alloc_array_1d(arrtype, tupsize(x));
-  arrn = jl_alloc_array_1d(arrtype, tupsize(N));
-
-  /* access the origin and size array data pointers. */
-  datx = (double*) jl_array_data(arrx);
-  datn = (double*) jl_array_data(arrn);
-
-  /* fill the origin and size arrays. */
-  for (i = 0; i < tupsize(x); i++) {
-    datx[i] = (double) tupget(x, i);
-    datn[i] = (double) tupget(N, i);
-  }
-
-  /* initialize the argument array. */
-  JL_GC_PUSHARGS(args, 2);
-
-  /* construct an argument array for the method call. */
-  args[0] = (jl_value_t*) arrx;
-  args[1] = (jl_value_t*) arrn;
-
-  /* call the gap equation with the current arguments. */
-  boxfval = jl_call(rejfn, args, 2);
-
-  /* check if an exception occurred. */
-  if (jl_exception_occurred()) {
-    /* output an error. */
-    fprintf(stderr, "error: f([%u.0",
-      tupget(x, 0));
-    for (i = 1; i < tupsize(x); i++)
-      fprintf(stderr, ", %u.0", tupget(x, i));
-    fprintf(stderr, "], [%u.0", tupget(N, 0));
-    for (i = 1; i < tupsize(N); i++)
-      fprintf(stderr, ", %u.0", tupget(N, i));
-    fprintf(stderr, "]) ==> %s\n",
-      jl_typeof_str(jl_exception_occurred()));
-
-    /* force the error to be printed. */
-    fflush(stderr);
-  }
-  else {
-    /* unbox the computed result. */
-    fval = jl_unbox_float64(boxfval);
-  }
-
-  /* release the references to the function arguments. */
-  JL_GC_POP();
-
-  /* return the well-behaved flag. */
-  return fval;
-}
-
 /* rejsamp(): compute a new multidimensional index via rejection sampling.
  *
  * arguments:
@@ -245,8 +104,8 @@ int rej (const char *fn, tuple_t *N, double d, tuple_t *lst) {
     return 0;
   }
 
-  /* initialize the function computation environment. */
-  if (!rejinit(fn)) {
+  /* initialize the density function evaluation environment. */
+  if (!evalinit(fn, EVAL_PDF)) {
     /* output an error message and return failure. */
     fprintf(stderr, "error: failed to compile density equation\n");
     return 0;
@@ -276,7 +135,8 @@ int rej (const char *fn, tuple_t *N, double d, tuple_t *lst) {
     tupunpack(i, N, &x);
 
     /* evaluate the density function. */
-    pdf[i] = rejeval(&x, N);
+    if (evalpdf(pdf + i, &x, N) != EVAL_OK)
+      return 0;
 
     /* check for a new maximum value. */
     if (pdf[i] > pdfmax)

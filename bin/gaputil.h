@@ -26,10 +26,10 @@
 #include <string.h>
 #include <math.h>
 
-/* include the tuple, sequence and term headers. */
+/* include the tuple, sequence and evaluation headers. */
 #include "tup.h"
 #include "seq.h"
-#include "term.h"
+#include "eval.h"
 
 /* define a soft-limit for the number of dimensions that the program
  * is willing to build grids on.

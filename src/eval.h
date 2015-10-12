@@ -21,8 +21,8 @@
  */
 
 /* ensure once-only inclusion. */
-#ifndef __GAPUTIL_TERM_H__
-#define __GAPUTIL_TERM_H__
+#ifndef __GAPUTIL_EVAL_H__
+#define __GAPUTIL_EVAL_H__
 
 /* include standard c library headers. */
 #include <stdio.h>
@@ -37,23 +37,36 @@
 #include "qrng.h"
 
 /* define required function return values:
- *  TERM_OK: indicates success.
- *  TERM_ERR: indicates a general error.
- *  TERM_INVALID: previous sequence term is out of bounds.
- *  TERM_EXCEPTION: an error occurred during gap evalution.
+ *  EVAL_OK: indicates success.
+ *  EVAL_ERR: indicates a general error.
+ *  EVAL_INVALID: previous sequence term is out of bounds.
+ *  EVAL_EXCEPTION: an error occurred during gap evalution.
  */
-#define TERM_OK          1
-#define TERM_ERR         0
-#define TERM_INVALID    -1
-#define TERM_EXCEPTION  -2
+#define EVAL_OK          1
+#define EVAL_ERR         0
+#define EVAL_INVALID    -1
+#define EVAL_EXCEPTION  -2
+
+/* evaltype_t: enumerated type for which kind of evaluation engine
+ * is in use by the main application.
+ *  => EVAL_GAP: sampling from a gap equation.
+ *  => EVAL_PDF: sampling from a density function.
+ */
+typedef enum {
+  EVAL_GAP = 0,
+  EVAL_PDF = 1
+}
+evaltype_t;
 
 /* function declarations: */
 
-int terminit (const char *fstr);
+int evalinit (const char *fstr, evaltype_t ftype);
 
-void termfree (void);
+void evalfree (void);
 
-int term (double *x, int d, tuple_t *O, tuple_t *N, double L);
+int evalgap (double *x, int d, tuple_t *O, tuple_t *N, double L);
 
-#endif /* !__GAPUTIL_TERM_H__ */
+int evalpdf (double *fx, tuple_t *x, tuple_t *N);
+
+#endif /* !__GAPUTIL_EVAL_H__ */
 

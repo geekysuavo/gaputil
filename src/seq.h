@@ -29,10 +29,10 @@
 #include <stdlib.h>
 #include <math.h>
 
-/* include the tuple, search tree and term headers. */
+/* include the tuple, search tree and evaluation headers. */
 #include "tup.h"
 #include "bst.h"
-#include "term.h"
+#include "eval.h"
 
 /* function declarations: */
 

@@ -122,7 +122,7 @@ int main (int argc, char **argv) {
   tupfree(&N);
 
   /* return successfully. */
-  rejfree();
+  evalfree();
   return 0;
 }
 
