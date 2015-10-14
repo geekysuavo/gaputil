@@ -1,5 +1,5 @@
 
-/* gaputil: generalized gap sampling schedule generation utility.
+/* nusutils: generalized deterministic nonuniform sampling utilities.
  * Copyright (C) 2015 Bradley Worley <geekysuavo@gmail.com>.
  *
  * This program is free software; you can redistribute it and/or
@@ -134,6 +134,10 @@ void tupsort (tuple_t *t) {
    *  @n: tuple heap size.
    */
   unsigned int i, n;
+
+  /* return if the tuple contains no elements. */
+  if (tupsize(t) == 0)
+    return;
 
   /* heapify the tuple elements. */
   tupsort_heapify(t, t->n);

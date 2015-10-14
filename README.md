@@ -1,6 +1,6 @@
-# gaputil
+# nusutils
 
-A pair of command-line utilities for deterministically (_i.e._ without
+A set of command-line utilities for deterministically (_i.e._ without
 pseudorandom numbers) constructing nonuniform sampling schedules on
 multidimensional Nyquist grids. The **gaputil** is a utility to construct
 schedules using the generalized gap sampling framework published in:
@@ -8,8 +8,9 @@ schedules using the generalized gap sampling framework published in:
 > Worley, B., Powers, R., _Deterministic Multidimensional Nonuniform
 > Gap Sampling_, Journal of Magnetic Resonance, 2015, Accepted.
 
-The **rejutil** is a utility to construct schedules from density functions
-using a quasirandom accept-reject sampling method published in:
+The **rejutil** and **jitutil** are utilities to construct schedules from
+density functions using a quasirandom accept-reject sampling method
+published in:
 
 > Worley, B., _A Subrandom Accept-Reject Method for Deterministic
 > Multidimensional Nonuniform Sampling_, Journal of Biomolecular NMR,
@@ -75,10 +76,10 @@ g(x, d, O, N, L) =
 In short, **gaputil** accepts almost any inline function having
 Julia syntax.
 
-### Examples using **rejutil**
+### Examples using **rejutil** and **jitutil**
 
-The **rejutil** program also uses Julia to interpret its density function,
-but this function is of a simpler form:
+The **rejutil** and **jitutil** programs also use Julia to interpret their
+density function, but this function is of a simpler form:
 
 ```julia
 f(x::Array{Float64,1}, N::Array{Float64,1})
@@ -87,7 +88,8 @@ f(x::Array{Float64,1}, N::Array{Float64,1})
 where **x** now holds the _current_ grid index, and **N** still holds the
 total grid size. No optimization is performed: **rejutil** simply draws a
 set number of points (grid indices) from the distribution specified in the
-density function.
+density function. On the other hand, **jitutil** draws the same number of
+points using a jittered rejection sampling algorithm.
 
 The simplest possible density function is a uniform grid:
 
@@ -101,21 +103,22 @@ An exponentially weighted function would look like this:
 f(x, N) = exp(-sum(x ./ N))
 ```
 
-Like **gaputil**, **rejutil** will accept any inline function having Julia
-syntax and conforming to the interface specified above.
+Like **gaputil**, **rejutil** and **jitutil** will accept any inline
+function having Julia syntax and conforming to the interface specified
+above.
 
 ### Installing
 
 You will need to have Julia 0.4.0-dev compiled and installed in
-order to build **gaputil** and **rejutil**. It is recommended that
-you compile and install from the latest GitHub nightly commit.
+order to build **nusutils**. It is recommended that you compile
+and install from the latest GitHub nightly commit.
 
 Once Julia is installed into the path, you can compile and install
-**gaputil** and **rejutil** as follows:
+**gaputil**, **rejutil** and **jitutil** as follows:
 
-> git clone git://github.com/geekysuavo/gaputil.git
+> git clone git://github.com/geekysuavo/nusutils.git
 
-> cd gaputil
+> cd nusutils
 
 > make
 

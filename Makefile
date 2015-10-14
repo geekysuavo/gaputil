@@ -19,9 +19,9 @@ LDLIBS+= $(shell $(JL_SHARE)/julia-config.jl --ldlibs)
 LDFLAGS+= $(shell $(JL_SHARE)/julia-config.jl --ldflags)
 
 # binaries and objects to compile and link.
-BIN=bin/gaputil bin/rejutil
-MAN=man/gaputil.1 man/rejutil.1
-OBJ=tup bst srt seq rej eval qrng
+BIN=bin/gaputil bin/rejutil bin/jitutil
+MAN=man/gaputil.1 man/rejutil.1 man/jitutil.1
+OBJ=tup bst srt seq rej jit eval qrng
 OBJS=$(addsuffix .o,$(addprefix src/,$(OBJ)))
 BINOBJS=$(addsuffix .o,$(BIN))
 
@@ -38,6 +38,11 @@ bin/gaputil: $(OBJS) bin/gaputil.o
 
 # rejutil: second executable linkage target.
 bin/rejutil: $(OBJS) bin/rejutil.o
+	@echo " LD $@"
+	@$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+
+# jitutil: third executable linkage target.
+bin/jitutil: $(OBJS) bin/jitutil.o
 	@echo " LD $@"
 	@$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 

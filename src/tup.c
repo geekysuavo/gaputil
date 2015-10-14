@@ -1,5 +1,5 @@
 
-/* gaputil: generalized gap sampling schedule generation utility.
+/* nusutils: generalized deterministic nonuniform sampling utilities.
  * Copyright (C) 2015 Bradley Worley <geekysuavo@gmail.com>.
  *
  * This program is free software; you can redistribute it and/or
@@ -383,6 +383,37 @@ unsigned int tupfind (tuple_t *t) {
   for (i = 0; i < t->n; i++) {
     /* return the index of the first nonzero element encountered. */
     if (t->elem[i])
+      return i + 1;
+  }
+
+  /* return failure. */
+  return 0;
+}
+
+/* tupsearch(): find the first matching element of a tuple.
+ *
+ * arguments:
+ *  @t: pointer to the input tuple.
+ *  @idx: value to search for.
+ *
+ * returns:
+ *  one-based index of the first matching tuple element, or (0) on failure or
+ *  all zeros.
+ */
+unsigned int tupsearch (tuple_t *t, unsigned int idx) {
+  /* declare required variables:
+   *  @i: tuple element index.
+   */
+  unsigned int i;
+
+  /* ensure the tuple pointer is valid. */
+  if (!t)
+    return 0;
+
+  /* loop over the tuple elements. */
+  for (i = 0; i < t->n; i++) {
+    /* return if the value in the tuple matches the search value. */
+    if (t->elem[i] == idx)
       return i + 1;
   }
 

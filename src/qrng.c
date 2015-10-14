@@ -1,5 +1,5 @@
 
-/* rejutil: quasirandom rejection sampling schedule generation utility.
+/* nusutils: generalized deterministic nonuniform sampling utilities.
  * Copyright (C) 2015 Bradley Worley <geekysuavo@gmail.com>.
  *
  * This program is free software; you can redistribute it and/or
@@ -186,5 +186,19 @@ void qrngeval (qrng_t *g) {
       }
     }
   }
+}
+
+/* qrngget(): retrieve the current term in a quasirandom sequence.
+ *
+ * arguments:
+ *  @g: pointer to the generator to access.
+ *  @i: pointer to the term index to get.
+ *
+ * returns:
+ *  the value of the current sequence term at the requested index, or zero.
+ */
+double qrngget (qrng_t *g, unsigned int i) {
+  /* return the currently stored value. */
+  return ((g && i < g->n) ? g->x[i] : 0.0);
 }
 

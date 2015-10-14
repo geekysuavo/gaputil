@@ -21,44 +21,25 @@
  */
 
 /* ensure once-only inclusion. */
-#ifndef __NUSUTILS_QRNG_H__
-#define __NUSUTILS_QRNG_H__
+#ifndef __NUSUTILS_JIT_H__
+#define __NUSUTILS_JIT_H__
 
 /* include standard c library headers. */
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <math.h>
 
-/* include the tuple header. */
+/* include the julia library header. */
+#include <julia.h>
+
+/* include the tuple, qrng and evaluation headers. */
 #include "tup.h"
-
-/* qrng_t: type definition of an n-dimensional quasirandom number generator.
- */
-typedef struct {
-  /* @n: number of random variates per iteration. */
-  unsigned int n;
-
-  /* @bv: array of relatively prime bases.
-   * @sv: current state of the quasirandom sequence.
-   */
-  unsigned int *bv;
-  unsigned int **sv;
-
-  /* @x: array of quasirandom iterates.
-   */
-  double *x;
-}
-qrng_t;
+#include "qrng.h"
+#include "eval.h"
 
 /* function declarations: */
 
-int qrngalloc (qrng_t *g, unsigned int n);
+int jit (const char *fn, tuple_t *N, double d, tuple_t *lst);
 
-void qrngfree (qrng_t *g);
-
-void qrngeval (qrng_t *g);
-
-double qrngget (qrng_t *g, unsigned int i);
-
-#endif /* !__NUSUTILS_QRNG_H__ */
+#endif /* !__NUSUTILS_JIT_H__ */
 

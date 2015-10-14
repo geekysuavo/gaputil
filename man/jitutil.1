@@ -30,13 +30,13 @@
 .ie \\n(.$=0:((0\\$1)*2u>(\\n(.1u-\\n(.iu)) .TP
 .el .TP "\\$1"
 ..
-.TH GAPUTIL 1 "15 Oct 2015" "nusutils version 20151015"
+.TH JITUTIL 1 "15 Oct 2015" "nusutils version 20151015"
 .SH NAME
-gaputil \- build nonuniform gap-sampling schedules
+jitutil \- build nonuniform jittered rejection-sampling schedules
 
 .SH SYNOPSIS
-.B gaputil
-\fIdensity\fR \fIN1\fR [\fIN2\fR [\fIN3\fR]] \fIgapfunc\fR
+.B jitutil
+\fIdensity\fR \fIN1\fR [\fIN2\fR [\fIN3\fR]] \fIdensfunc\fR
 
 .SH DESCRIPTION
 .PP
@@ -46,67 +46,45 @@ specified in \fIdensity\fR as a value between 0 and 1. The arguments
 \fIN1\fR, \fIN2\fR and \fIN3\fR are used to specify the size(s) of the
 sampling grid to build the schedule upon.
 .PP
-Finally, the \fIgapfunc\fR argument must be supplied as a string (text)
-that holds the gap equation. It is recommended that the gap equation be
-placed in single quotes in order to ensure proper parsing.
+Finally, the \fIdensfunc\fR argument must be supplied as a string (text)
+that holds the sampling density function. It is recommended that the
+density function be placed in single quotes in order to ensure proper
+parsing.
 
-.SH "GAP EQUATIONS"
-Gap equations are defined in the Julia programming language. At program
-startup, \fBgaputil\fR hands the value specified in \fIgapfunc\fR to a
-Julia interpreter, which compiles it for later evaluation. All gap
-equations must obey the following interface:
+.SH "DENSITY FUNCTIONS"
+Density functions are defined in the Julia programming language. At program
+startup, \fBjitutil\fR hands the value specified in \fIdensfunc\fR to a
+Julia interpreter, which compiles it for later evaluation. All density
+functions must obey the following interface:
 
 .in +4n
 .nf
 
-g(x::Float64, d::Int32,
-  O::Array{Float64,1},
-  N::Array{Float64,1},
-  L::Float64)
+f(x::Array{Float64,1}, N::Array{Float64,1})
 .fi
 .in
 
-where \fBx\fR is the current sequence term, \fBd\fR is the dimension along
-which the gap sampling algorithm is placing points, \fBO\fR is an array of
-origin values, \fBN\fR is an array of grid sizes, and \fBL\fR is a scaling
-factor that the gap sampling algorithm will adjust in order to achieve the
-desired global sampling density. The arrays \fBO\fR and \fBN\fR both contain
-an element for each dimension in the sampled grid, and may be indexed with
-\fIe.g.\fR \fBd\fR.
+where \fBx\fR is the current grid index and \fBN\fR is an array of grid sizes.
+The arrays \fBx\fR and \fBN\fR both contain an element for each dimension in
+the sampled grid, and may be indexed accordingly.
 
 .PP
-The simplest possible gap equation is a uniform lattice:
+The simplest possible density function is a uniform distribution:
 .in +4n
 .nf
 
-L
+1.0
 .fi
 .in
 
 .PP
-For another example, the sine-gap equation is as follows:
+For another example, exponential sampling is as follows:
 .in +4n
 .nf
 
-L * sin((pi / 2) * (x + sum(O)) / sum(N))
+exp(-sum(x ./ N))
 .fi
 .in
-
-.PP
-The sine-burst equation is a bit longer:
-.in +4n
-.nf
-
-L * sin((pi / 2) * (x + sum(O)) / sum(N))
-  * sin((pi / 4) * N[d] * (x + sum(O)) / sum(N))^2
-.fi
-.in
-
-.PP
-For simplicity, the \fBsinegap()\fR and \fBsineburst()\fR methods are
-predefined within the gap utility. To use these functions, just specify
-the \fIgapfunc\fR argument as \fBsinegap(x,d,O,N,L)\fR or
-\fBsineburst(x,d,O,N,L)\fR when running the utility.
 
 .PP
 For more detailed information on the accepted syntax of gap equations,
@@ -115,11 +93,11 @@ consult the Julia language documentation.
 .SH NOTE
 The utility is currently soft-limited to building up to three-dimensional
 schedules, but this may be trivially changed in the source code prior to
-compilation. See \fIgaputil.h\fR for more information.
+compilation. See \fIjitutil.h\fR for more information.
 
 .SH CITING
-If you use the gap utility in any published work, it is requested that you
-provide attribution to the following peer-reviewed article:
+If you use the rejection sampling utility in any published work, it is
+requested that you provide attribution to the following peer-reviewed article:
 
 .in +4n
 .nf
@@ -142,6 +120,6 @@ version 2.0 of the GNU General Public License
 There is NO WARRANTY, to the extent permitted by law.
 
 .SH "SEE ALSO"
+.BR gaputil(1),
 .BR rejutil(1),
-.BR jitutil(1),
 .BR julia(1)

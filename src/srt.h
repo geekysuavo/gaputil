@@ -1,5 +1,5 @@
 
-/* gaputil: generalized gap sampling schedule generation utility.
+/* nusutils: generalized deterministic nonuniform sampling utilities.
  * Copyright (C) 2015 Bradley Worley <geekysuavo@gmail.com>.
  *
  * This program is free software; you can redistribute it and/or
@@ -21,8 +21,8 @@
  */
 
 /* ensure once-only inclusion. */
-#ifndef __GAPUTIL_SRT_H__
-#define __GAPUTIL_SRT_H__
+#ifndef __NUSUTILS_SRT_H__
+#define __NUSUTILS_SRT_H__
 
 /* include the tuple header. */
 #include "tup.h"
@@ -33,5 +33,5 @@ void tupsort (tuple_t *t);
 
 void tupuniq (tuple_t *t);
 
-#endif /* !__GAPUTIL_SRT_H__ */
+#endif /* !__NUSUTILS_SRT_H__ */
 
