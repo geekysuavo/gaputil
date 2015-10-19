@@ -166,7 +166,7 @@ int jitsamp (qrng_t *G, double *pdf, double pjit, tuple_t *mask,
 
   /* ensure that a suitable index was located. */
   if (!tupget(mask, imax))
-    return 0;
+    return 1;
 
   /* append the index into the region tuple. */
   tupappend(&Y, imax);
@@ -290,6 +290,7 @@ int jit (const char *fn, tuple_t *N, double d, tuple_t *lst) {
    *  @pdf: probability density function, evaluated on the grid.
    *  @pdfsum: summed values of @pdf over the entire data grid.
    *  @x: unpacked grid point index for density evaluation.
+   *  @Tlst: binary search tree for index storage.
    *  @G: quasirandom number generator structure.
    *  @i: term generation loop counter.
    *  @n: term generation loop size.
@@ -298,10 +299,14 @@ int jit (const char *fn, tuple_t *N, double d, tuple_t *lst) {
   unsigned int i, n, xi;
   double *pdf, pdfsum;
   tuple_t x, mask;
+  bst_t *Tlst;
   qrng_t G;
 
   /* initialize the output tuple. */
   tupinit(lst);
+
+  /* initialize the binary search tree. */
+  Tlst = NULL;
 
   /* allocate the index and mask tuples. */
   if (!tupalloc(&x, tupsize(N)) ||
@@ -369,10 +374,14 @@ int jit (const char *fn, tuple_t *N, double d, tuple_t *lst) {
     if (!jitsamp(&G, pdf, pdfsum, &mask, &x, N))
       return 0;
 
-    /* pack and append the new value into the output tuple. */
+    /* pack and insert the new value into the search tree. */
     tuppack(&x, N, &xi);
-    tupappend(lst, xi);
+    Tlst = bstinsert(Tlst, xi);
   }
+
+  /* dumped the sorted samples from the search tree. */
+  bstsort(Tlst, lst);
+  bstfree(Tlst);
 
   /* free the allocated tuples. */
   tupfree(&mask);

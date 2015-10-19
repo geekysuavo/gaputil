@@ -29,7 +29,6 @@
 
 /* include the tuple, sorting, jittering and evaluation headers. */
 #include "tup.h"
-#include "srt.h"
 #include "jit.h"
 #include "eval.h"
 
