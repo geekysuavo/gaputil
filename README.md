@@ -6,7 +6,7 @@ multidimensional Nyquist grids. The **gaputil** is a utility to construct
 schedules using the generalized gap sampling framework published in:
 
 > Worley, B., Powers, R., _Deterministic Multidimensional Nonuniform
-> Gap Sampling_, Journal of Magnetic Resonance, 2015, Accepted.
+> Gap Sampling_, Journal of Magnetic Resonance, 2015, 261: 19-26.
 
 The **rejutil** and **jitutil** are utilities to construct schedules from
 density functions using a quasirandom accept-reject sampling method
@@ -14,7 +14,7 @@ published in:
 
 > Worley, B., _Subrandom Accept-Reject Methods for Deterministic
 > Multidimensional Nonuniform Sampling_, Journal of Biomolecular NMR,
-> 2015, Submitted.
+> 2015, Under review.
 
 ## Introduction
 
