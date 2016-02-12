@@ -12,9 +12,8 @@ The **rejutil** and **jitutil** are utilities to construct schedules from
 density functions using a quasirandom accept-reject sampling method
 published in:
 
-> Worley, B., _Subrandom Accept-Reject Methods for Deterministic
-> Multidimensional Nonuniform Sampling_, Journal of Biomolecular NMR,
-> 2015, Under review.
+> Worley, B., _Subrandom Methods for Multidimensional Nonuniform
+> Sampling_, Journal of Magnetic Resonance, 2016, In preparation.
 
 ## Introduction
 
