@@ -13,7 +13,7 @@ density functions using a quasirandom accept-reject sampling method
 published in:
 
 > Worley, B., _Subrandom Methods for Multidimensional Nonuniform
-> Sampling_, Journal of Magnetic Resonance, 2016, In preparation.
+> Sampling_, Journal of Magnetic Resonance, 2016, 269: 128-137.
 
 ## Introduction
 
