@@ -25,7 +25,7 @@ of a full generalization of their PG method to admit _any_ gap equation.
 Initial versions of **gaputil** contained hard-coded Poisson-gap, sine-gap,
 and sine-burst (_cf._ Worley and Powers, above) gap equations. The generality
 of the proposed framework was a tempting opportunity for me to embed the
-[Julia programming language] (http://julialang.org/) into one of my software
+[Julia programming language](http://julialang.org/) into one of my software
 projects. By embedding Julia into my existing gap sampling algorithm, this
 utility enables the construction of NUS schedules from _completely arbitrary_
 gap equations.
@@ -125,8 +125,7 @@ Once Julia is installed into the path, you can compile and install
 
 ## Licensing
 
-This project is released under the [GNU GPL 2.0] (
-http://www.gnu.org/licenses/old-licenses/gpl-2.0.html).
+This project is released under the [GNU GPL 2.0](LICENSE).
 
 Have fun with it,
 
