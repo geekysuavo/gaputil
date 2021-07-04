@@ -115,19 +115,13 @@ and install from the latest GitHub nightly commit.
 Once Julia is installed into the path, you can compile and install
 **gaputil**, **rejutil** and **jitutil** as follows:
 
-> git clone git://github.com/geekysuavo/nusutils.git
-
-> cd nusutils
-
-> make
-
-> sudo make install
+```bash
+git clone git://github.com/geekysuavo/nusutils.git
+cd nusutils
+make
+sudo make install
+```
 
 ## Licensing
 
 This project is released under the [GNU GPL 2.0](LICENSE).
-
-Have fun with it,
-
-*~ Brad.*
-
